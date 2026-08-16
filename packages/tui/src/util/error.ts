@@ -1,3 +1,4 @@
+import { Cause } from "effect"
 import { isRecord } from "./record"
 
 type ConfigIssue = { message: string; path: string[] }
@@ -94,7 +95,10 @@ function field(input: Record<string, unknown>, key: string) {
   return typeof input[key] === "string" ? input[key] : undefined
 }
 
+/** Formats arbitrary thrown values for user-facing diagnostics. */
 export function errorFormat(error: unknown): string {
+  if (Cause.isCause(error)) return Cause.pretty(error)
+
   if (error instanceof Error) {
     return error.stack ?? `${error.name}: ${error.message}`
   }
